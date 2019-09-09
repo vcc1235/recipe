@@ -1,0 +1,22 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /recipe
+  tomcat:
+    accesslog:
+      buffered: true
+      directory: ${pom.basedir}/logs/tomcat
+      enabled: false
+spring: 
+  application:
+    name: recipe
+  datasource:
+    password: Redis!@#123
+  redis:
+    database: 2
+    host: 47.244.61.17
+    password: Redis!@#123
+logging:
+  config: classpath:logback-spring-dev.xml
+
+

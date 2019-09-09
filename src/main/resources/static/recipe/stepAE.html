@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Step</title>
+<meta name="renderer" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<link rel="stylesheet" href="../layuiadmin/layui/css/layui.css" media="all">
+<link rel="stylesheet" href="../layuiadmin/style/admin.css" media="all">
+</head>
+<body>
+
+	<div class="layui-fluid">
+		<div class="layui-card">
+			<div class="layui-card-header">Step</div>
+			<div class="layui-card-body" style="padding: 15px;">
+									<form class="layui-form" action="/recipe/recipe/base/step/aeStep" lay-filter="component-form-group" method="POST">
+					<div class="layui-form-item">
+						<label class="layui-form-label">步骤</label>
+						<div class="layui-input-block">
+							<input type="text" id="stepStep" name="stepStep" lay-verify="stepStep" autocomplete="off" placeholder="步骤" class="layui-input">
+						</div>
+					</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label">步骤标题</label>
+						<div class="layui-input-block">
+							<input type="text" id="stepName" name="stepName" lay-verify="stepName" autocomplete="off" placeholder="步骤标题" class="layui-input">
+						</div>
+					</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label">步骤图片</label>
+						<div class="layui-input-block">
+							<input type="text" id="stepImg" name="stepImg" lay-verify="stepImg" autocomplete="off" placeholder="步骤图片" class="layui-input">
+						</div>
+					</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label">菜的id</label>
+						<div class="layui-input-block">
+							<input type="text" id="footId" name="footId" lay-verify="footId" autocomplete="off" placeholder="菜的id" class="layui-input">
+						</div>
+					</div>
+
+							<input type="hidden" id="stepId" name="stepId">
+
+					<div class="layui-form-item">
+						<label class="layui-form-label">状态</label>
+						<div class="layui-input-block">
+					      <input type="radio" name="tbStatus" value="正常" title="正常" checked>
+					      <input type="radio" name="tbStatus" value="停用" title="停用">
+					      <input type="radio" name="tbStatus" value="删除" title="删除">
+					    </div>
+					</div>
+					<div class="layui-form-item">
+						<div class="layui-input-block">
+							 <button class="layui-btn" lay-submit lay-filter="component-form-element">立即提交</button>
+							<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	
+	<script src="../layuiadmin/layui/layui.js"></script>
+	<script src="../layuiadmin/layui/tools.js"></script>
+	<script src="recipeBase.js"></script>
+	<script>
+		layui.config({
+			base : '../layuiadmin/' //静态资源所在路径
+		}).extend({
+			index : 'lib/index' //主入口模块
+		}).use([ 'index', 'form', 'laydate', 'layedit', 'layer' ], function() {
+			var layedit = layui.layedit;
+			//构建一个默认的编辑器
+			var index = layedit.build('demo');
+			var $ = layui.$, admin = layui.admin, element = layui.element, layer = layui.layer, laydate = layui.laydate, form = layui.form;
+			var getByIdUrl = stepByIdURL;
+			$(function() {
+				getById();
+			});
+			function getById() {
+				var stepId = getUrlParam("stepId");
+				if (stepId == null || stepId.length == 0) {
+					return false;
+				} else {
+					$("#status").attr("disabled",false);
+				}
+				$.ajax({
+					url : getByIdUrl,
+					headers : {"token": token},
+					type : "post",
+					headers:{"token":token},
+					data : {
+						"stepId" : stepId
+					},
+					success : function(res) {
+						if (res.statusCode == "200") {
+														$("#stepId").val(res.data.stepId);
+							$("#stepStep").val(res.data.stepStep);
+							$("#stepName").val(res.data.stepName);
+							$("#stepImg").val(res.data.stepImg);
+							$("#footId").val(res.data.footId);
+							$("#tbStatus").val(res.data.tbStatus);
+
+						}
+					}
+				})
+			}
+
+			form.render(null, 'component-form-group');
+
+			laydate.render({
+				elem : '#LAY-component-form-group-date'
+			});
+
+			/* 自定义验证规则 */
+			form.verify({
+				title : function(value) {
+					if (value.length < 3) {
+						return '标题至少得5个字符啊';
+					}
+				}
+			});
+
+			/* 监听提交 */
+			form.on('submit(component-form-element)', function(data) {		
+				var postData = data.field;
+				var msg = "";
+
+				$.ajax({
+					type: 'POST',
+		            url:stepAEURL,
+		            headers:{"token":token},
+		            data:postData,
+		            crossDomain: true,
+// 		            dataType:'jsonp',
+		            success:function(data){
+		            	if (data.statusCode == 200) {
+		            		layer.alert("添加成功 ！！！");
+	 						window.parent.location.reload();
+							var index = parent.layer.getFrameIndex(window.name);
+							parent.layer.close(index);
+	 					} else {
+	 						layer.msg(data.statusMsg);
+	 					}
+		            }
+		        });
+				return false;
+			});
+		});
+	</script>
+</body>
+</html>
+
